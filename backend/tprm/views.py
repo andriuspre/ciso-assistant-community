@@ -710,11 +710,18 @@ class EntityAssessmentViewSet(BaseModelViewSet):
         instance = self.get_object()
         if instance.compliance_assessment:
             folder = instance.compliance_assessment.folder
-            instance.compliance_assessment.delete()
             if folder.content_type == Folder.ContentType.ENCLAVE:
+                logger.info(
+                    "deleting_compliance_assessment_folder",
+                    folder_id=str(folder.id),
+                    content_type=str(folder.content_type),
+                )
                 folder.delete()
             else:
-                logger.warning("Compliance assessment folder is not an Enclave", folder)
+                logger.warning(
+                    "Compliance assessment folder is not an Enclave, skipping deletion",
+                    folder=folder,
+                )
 
         return super().destroy(request, *args, **kwargs)
 
